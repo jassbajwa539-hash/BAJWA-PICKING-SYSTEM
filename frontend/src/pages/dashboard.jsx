@@ -8,6 +8,8 @@ function Dashboard() {
 
     const user = JSON.parse(localStorage.getItem("user"));
 
+    const [loading, setLoading] = useState(true);
+
     const [summary, setSummary] = useState({
         inventory: 0,
         orders: 0,
@@ -34,11 +36,43 @@ function Dashboard() {
                 }
             );
 
-            setSummary(res.data);
+            console.log("Dashboard Response:", res.data);
+
+            setSummary({
+                inventory:
+                    Number(res.data.inventory) ||
+                    Number(res.data.total_inventory) ||
+                    0,
+
+                orders:
+                    Number(res.data.orders) ||
+                    Number(res.data.total_orders) ||
+                    0,
+
+                pending:
+                    Number(res.data.pending) ||
+                    Number(res.data.pending_picks) ||
+                    0,
+
+                completed:
+                    Number(res.data.completed) ||
+                    Number(res.data.completed_picks) ||
+                    0
+            });
 
         } catch (err) {
 
-            console.log(err);
+            console.error(err);
+
+            alert(
+                JSON.stringify(
+                    err.response?.data || err.message
+                )
+            );
+
+        } finally {
+
+            setLoading(false);
 
         }
 
@@ -52,7 +86,7 @@ function Dashboard() {
 
     };
 
-    const card = {
+    const cardStyle = {
         background: "#fff",
         padding: 20,
         borderRadius: 10,
@@ -60,7 +94,7 @@ function Dashboard() {
         textAlign: "center"
     };
 
-    const button = {
+    const buttonStyle = {
         padding: 18,
         border: "none",
         borderRadius: 8,
@@ -70,6 +104,13 @@ function Dashboard() {
         fontSize: 16
     };
 
+    if (loading)
+        return (
+            <div style={{ padding: 40 }}>
+                <h2>Loading Dashboard...</h2>
+            </div>
+        );
+
     return (
 
         <div style={{ background: "#f5f6fa", minHeight: "100vh" }}>
@@ -77,7 +118,7 @@ function Dashboard() {
             <div
                 style={{
                     background: "#1976d2",
-                    color: "white",
+                    color: "#fff",
                     display: "flex",
                     justifyContent: "space-between",
                     alignItems: "center",
@@ -91,7 +132,7 @@ function Dashboard() {
 
                     <small>
 
-                        Welcome {user?.full_name}
+                        Welcome {user?.full_name || user?.username}
 
                     </small>
 
@@ -104,7 +145,8 @@ function Dashboard() {
                         color: "#fff",
                         border: "none",
                         padding: "10px 20px",
-                        borderRadius: 5
+                        borderRadius: 5,
+                        cursor: "pointer"
                     }}
                 >
 
@@ -123,22 +165,22 @@ function Dashboard() {
                 }}
             >
 
-                <div style={card}>
+                <div style={cardStyle}>
                     <h3>Total Inventory</h3>
                     <h1>{summary.inventory}</h1>
                 </div>
 
-                <div style={card}>
+                <div style={cardStyle}>
                     <h3>Total Orders</h3>
                     <h1>{summary.orders}</h1>
                 </div>
 
-                <div style={card}>
+                <div style={cardStyle}>
                     <h3>Pending Picks</h3>
                     <h1>{summary.pending}</h1>
                 </div>
 
-                <div style={card}>
+                <div style={cardStyle}>
                     <h3>Completed Picks</h3>
                     <h1>{summary.completed}</h1>
                 </div>
@@ -155,42 +197,42 @@ function Dashboard() {
             >
 
                 <button
-                    style={button}
+                    style={buttonStyle}
                     onClick={() => navigate("/inventory-upload")}
                 >
                     📦 Upload Inventory
                 </button>
 
                 <button
-                    style={button}
+                    style={buttonStyle}
                     onClick={() => navigate("/orders-upload")}
                 >
                     📋 Upload Orders
                 </button>
 
                 <button
-                    style={button}
+                    style={buttonStyle}
                     onClick={() => navigate("/generate-picking")}
                 >
                     ⚙️ Generate Picking
                 </button>
 
                 <button
-                    style={button}
+                    style={buttonStyle}
                     onClick={() => navigate("/pick-tasks")}
                 >
                     🚶 Pick Tasks
                 </button>
 
                 <button
-                    style={button}
+                    style={buttonStyle}
                     onClick={() => navigate("/inventory-list")}
                 >
                     📦 Inventory List
                 </button>
 
                 <button
-                    style={button}
+                    style={buttonStyle}
                     onClick={() => navigate("/reports")}
                 >
                     📈 Reports

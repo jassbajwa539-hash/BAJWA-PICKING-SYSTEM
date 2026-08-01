@@ -1,55 +1,155 @@
-body{
-    margin:0;
-    font-family:Arial,Helvetica,sans-serif;
-    background:#f2f5f8;
+/* src/styles/login.css */
+
+/* Global container with full background and blue overlay */
+.login-container {
+  min-height: 100vh;
+  width: 100vw;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  /* Applying the blue overlay and warehouse image */
+  background: linear-gradient(rgba(0,40,120,.80), rgba(0,40,120,.80)), url("/warehouse.jpg");
+  background-size: cover;
+  background-position: center;
+  font-family: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif";
+  padding: 20px;
+  box-sizing: border-box;
+  margin: 0;
 }
 
-.login-container{
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    height:100vh;
+/* White card with shadow and border radius */
+.login-card {
+  background-color: #FFFFFF;
+  border-radius: 15px; /* Border Radius from specifications */
+  box-shadow: 0 10px 30px rgba(0,0,0,.15); /* Shadow from specifications */
+  width: 100%;
+  max-width: 440px;
+  padding: 40px 35px;
+  text-align: center;
+  box-sizing: border-box;
 }
 
-.login-card{
-    width:350px;
-    background:white;
-    padding:35px;
-    border-radius:10px;
-    box-shadow:0 5px 20px rgba(0,0,0,.15);
+/* Header & Title Styling */
+.login-header {
+  margin-bottom: 15px;
 }
 
-.login-card h1{
-    text-align:center;
-    margin-bottom:10px;
+.logo-badge {
+  width: 80px;
+  height: 80px;
+  background-color: #F4F7FC; /* Background color from specs */
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 15px;
 }
 
-.login-card p{
-    text-align:center;
-    color:gray;
-    margin-bottom:25px;
+.login-title {
+  font-size: 32px;
+  font-weight: 800;
+  color: #0D47A1; /* Secondary color from specifications */
+  margin-bottom: 5px;
+  margin-top: 0;
+  letter-spacing: -0.5px;
+  line-height: 1.1;
+  text-transform: uppercase;
 }
 
-.login-card input{
-    width:100%;
-    padding:12px;
-    margin-bottom:15px;
-    border:1px solid #ccc;
-    border-radius:6px;
-    box-sizing:border-box;
+.login-owner {
+  font-size: 18px;
+  color: #555;
+  margin: 0;
+  font-weight: 500;
 }
 
-.login-card button{
-    width:100%;
-    padding:12px;
-    border:none;
-    border-radius:6px;
-    background:#1976d2;
-    color:white;
-    cursor:pointer;
-    font-size:16px;
+/* Horizontal Dividers */
+.login-divider {
+  border: none;
+  border-top: 1px solid #E0E0E0;
+  margin: 25px 0;
 }
 
-.login-card button:hover{
-    background:#125ca8;
+/* Form & Input Layout */
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.input-group {
+  text-align: left;
+}
+
+.input-group label {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: #333333;
+  margin-bottom: 8px;
+}
+
+/* Input styling with icons and space */
+.input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-icon {
+  position: absolute;
+  left: 14px;
+  pointer-events: none;
+}
+
+.input-wrapper input {
+  width: 100%;
+  padding: 14px 14px 14px 44px; /* Space for the left icon */
+  font-size: 15px;
+  border-radius: 8px;
+  border: 1px solid #CCCCCC;
+  background-color: #F4F7FC; /* Background color from specs */
+  color: #333;
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color 0.2s;
+}
+
+.input-wrapper input:focus {
+  border-color: #1565C0; /* Primary color from specifications */
+}
+
+/* Gradient Login Button */
+.login-button {
+  width: 100%;
+  padding: 16px;
+  font-size: 18px;
+  font-weight: bold;
+  /* Blue Gradient from specifications */
+  background: linear-gradient(90deg, #1565C0, #0D47A1); 
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  margin-top: 10px;
+  transition: opacity 0.2s ease, background 0.2s ease;
+}
+
+.login-button:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
+/* State for loading */
+.login-button:disabled {
+  background: linear-gradient(90deg, #A0A0A0, #808080);
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+/* Footer Styling */
+.login-footer {
+  font-size: 14px;
+  font-weight: 600;
+  color: #757575;
+  letter-spacing: 0.5px;
 }
