@@ -8,19 +8,63 @@ import OrdersUpload from "./pages/OrdersUpload";
 import PickTasks from "./pages/PickTasks";
 import RFPicking from "./pages/RFPicking";
 import GeneratePicking from "./pages/GeneratePicking";
+import InventoryList from "./pages/InventoryList";
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Login />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/picking" element={<Picking />} />
-        <Route path="/inventory-upload" element={<InventoryUpload />} />
-        <Route path="/orders-upload" element={<OrdersUpload />} />
-        <Route path="/pick-tasks" element={<PickTasks />} />
-        <Route path="/rf-picking" element={<RFPicking />} />
-        <Route path="/generate-picking" element={<GeneratePicking />} />
+
+        {/* Login */}
+        <Route
+          path="/"
+          element={<Login />}
+        />
+
+        {/* Dashboard */}
+        <Route
+          path="/dashboard"
+          element={<Dashboard />}
+        />
+
+        {/* Inventory */}
+        <Route
+          path="/inventory-upload"
+          element={<InventoryUpload />}
+        />
+
+        <Route
+          path="/inventory-list"
+          element={<InventoryList />}
+        />
+
+        {/* Orders */}
+        <Route
+          path="/orders-upload"
+          element={<OrdersUpload />}
+        />
+
+        {/* Picking */}
+        <Route
+          path="/generate-picking"
+          element={<GeneratePicking />}
+        />
+
+        <Route
+          path="/pick-tasks"
+          element={<PickTasks />}
+        />
+
+        <Route
+          path="/rf-picking/:taskId"
+          element={<RFPicking />}
+        />
+
+        <Route
+          path="/picking"
+          element={<Picking />}
+        />
+
       </Routes>
     </BrowserRouter>
   );

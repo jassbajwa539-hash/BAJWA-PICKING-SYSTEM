@@ -1,7 +1,10 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import api from "../api/api";
 
 function PickTasks() {
+
+    const navigate = useNavigate();
 
     const [tasks, setTasks] = useState([]);
 
@@ -48,6 +51,7 @@ function PickTasks() {
                 border="1"
                 cellPadding="10"
                 width="100%"
+                style={{ borderCollapse: "collapse" }}
             >
 
                 <thead>
@@ -81,10 +85,20 @@ function PickTasks() {
 
                             <td>
 
-                                <button>
-
+                                <button
+                                    onClick={() =>
+                                        navigate(`/rf-picking/${task.id}`)
+                                    }
+                                    style={{
+                                        background: "#1976d2",
+                                        color: "white",
+                                        border: "none",
+                                        padding: "8px 15px",
+                                        borderRadius: "5px",
+                                        cursor: "pointer"
+                                    }}
+                                >
                                     Start Picking
-
                                 </button>
 
                             </td>

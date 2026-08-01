@@ -1,9 +1,12 @@
 import { useEffect, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import api from "../api/api";
 
 function RFPicking() {
 
-    const [tasks, setTasks] = useState([]);
+    const { taskId } = useParams();
+    const navigate = useNavigate();
+
     const [currentTask, setCurrentTask] = useState(null);
 
     const [location, setLocation] = useState("");
@@ -11,33 +14,57 @@ function RFPicking() {
     const [serial, setSerial] = useState("");
 
     useEffect(() => {
-        loadTasks();
+        loadTask();
     }, []);
 
-    const loadTasks = async () => {
+    const loadTask = async () => {
 
-        const token = localStorage.getItem("token");
+        try {
 
-        const res = await api.get(
-            "/picking/tasks",
-            {
-                headers: {
-                    Authorization: `Bearer ${token}`
+            const token = localStorage.getItem("token");
+
+            const res = await api.get(
+                "/picking/tasks",
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
                 }
+            );
+
+            const task = res.data.find(
+                t => t.id === Number(taskId)
+            );
+
+            if (!task) {
+
+                alert("Task not found");
+
+                navigate("/pick-tasks");
+
+                return;
+
             }
-        );
 
-        setTasks(res.data);
+            setCurrentTask(task);
 
-        if (res.data.length > 0)
-            setCurrentTask(res.data[0]);
+        } catch (err) {
+
+            alert(
+                JSON.stringify(
+                    err.response?.data || err.message
+                )
+            );
+
+        }
+
     };
 
     const scan = async () => {
 
-        const token = localStorage.getItem("token");
-
         try {
+
+            const token = localStorage.getItem("token");
 
             await api.post(
                 "/rf/scan",
@@ -56,11 +83,7 @@ function RFPicking() {
 
             alert("Serial Picked Successfully");
 
-            setLocation("");
-            setBox("");
-            setSerial("");
-
-            loadTasks();
+            navigate("/pick-tasks");
 
         } catch (err) {
 
@@ -75,7 +98,7 @@ function RFPicking() {
     };
 
     if (!currentTask)
-        return <h2>No Pending Picking</h2>;
+        return <h2>Loading...</h2>;
 
     return (
 
@@ -93,14 +116,14 @@ function RFPicking() {
 
             <h3>Box : {currentTask.box}</h3>
 
-            <h3>Qty : {currentTask.required_qty}</h3>
+            <h3>Required Qty : {currentTask.required_qty}</h3>
 
             <br />
 
             <input
                 placeholder="Scan Location"
                 value={location}
-                onChange={(e)=>setLocation(e.target.value)}
+                onChange={(e) => setLocation(e.target.value)}
             />
 
             <br /><br />
@@ -108,7 +131,7 @@ function RFPicking() {
             <input
                 placeholder="Scan Box"
                 value={box}
-                onChange={(e)=>setBox(e.target.value)}
+                onChange={(e) => setBox(e.target.value)}
             />
 
             <br /><br />
@@ -116,15 +139,23 @@ function RFPicking() {
             <input
                 placeholder="Scan Serial"
                 value={serial}
-                onChange={(e)=>setSerial(e.target.value)}
+                onChange={(e) => setSerial(e.target.value)}
             />
 
             <br /><br />
 
-            <button onClick={scan}>
-
+            <button
+                onClick={scan}
+            >
                 Confirm Pick
+            </button>
 
+            <br /><br />
+
+            <button
+                onClick={() => navigate("/pick-tasks")}
+            >
+                Back
             </button>
 
         </div>
