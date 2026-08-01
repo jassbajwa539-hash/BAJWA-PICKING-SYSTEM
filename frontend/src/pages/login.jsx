@@ -17,9 +17,9 @@ function Login() {
 
             setLoading(true);
 
-            const res = await api.post("/login", {
-                username,
-                password
+            const res = await api.post("/auth/login", {
+                username: username,
+                password: password
             });
 
             localStorage.setItem(
@@ -36,14 +36,19 @@ function Login() {
 
         } catch (err) {
 
-            alert(
-                err.response?.data?.detail ||
-                "Login Failed"
-            );
+            console.error(err);
+
+            if (err.response) {
+                alert(JSON.stringify(err.response.data));
+            } else {
+                alert(err.message);
+            }
+
+        } finally {
+
+            setLoading(false);
 
         }
-
-        setLoading(false);
 
     };
 
@@ -55,26 +60,27 @@ function Login() {
 
                 <h1>Warehouse RF System</h1>
 
-                <p>Login to continue</p>
+                <p>Please Login</p>
 
                 <input
+                    type="text"
                     placeholder="Username"
                     value={username}
-                    onChange={(e)=>setUsername(e.target.value)}
+                    onChange={(e) => setUsername(e.target.value)}
                 />
 
                 <input
                     type="password"
                     placeholder="Password"
                     value={password}
-                    onChange={(e)=>setPassword(e.target.value)}
+                    onChange={(e) => setPassword(e.target.value)}
                 />
 
                 <button
                     onClick={login}
                     disabled={loading}
                 >
-                    {loading ? "Logging..." : "Login"}
+                    {loading ? "Logging in..." : "Login"}
                 </button>
 
             </div>
