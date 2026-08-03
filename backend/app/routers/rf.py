@@ -169,3 +169,339 @@ def scan_location(
         "location": expected,
         "message": "Location Verified"
     }
+from pydantic import BaseModel
+
+# -------------------------------------------------------
+# BOX SCAN MODEL
+# -------------------------------------------------------
+
+class BoxScan(BaseModel):
+    task_id: int
+    box: str
+
+
+# -------------------------------------------------------
+# SCAN BOX
+# -------------------------------------------------------
+
+@router.post("/rf/scan-box")
+def scan_box(
+    data: BoxScan,
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user)
+):
+
+    # Get Task
+    task = (
+        db.query(PickTask)
+        .filter(PickTask.id == data.task_id)
+        .first()
+    )
+
+    if not task:
+        raise HTTPException(
+            status_code=404,
+            detail="Task Not Found"
+        )
+
+    # Compare scanned box
+    expected_box = task.box.strip().upper()
+    scanned_box = data.box.strip().upper()
+
+    if expected_box != scanned_box:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Wrong Box. Expected {expected_box}"
+        )
+
+    # Box verified
+    return {
+
+        "success": True,
+
+        "message": "Box Verified",
+
+        "task_id": task.id,
+
+        "box": task.box,
+
+        "location": task.location,
+
+        "sku": task.sku,
+
+        "required_qty": task.required_qty,
+
+        "picked_qty": task.picked_qty,
+
+        "remaining_qty": task.required_qty - task.picked_qty
+
+    }
+from pydantic import BaseModel
+
+
+# -------------------------------------------------------
+# SERIAL SCAN MODEL
+# -------------------------------------------------------
+
+class SerialScan(BaseModel):
+    task_id: int
+    serial: str
+
+
+# -------------------------------------------------------
+# SCAN SERIAL
+# -------------------------------------------------------
+
+@router.post("/rf/scan-serial")
+def scan_serial(
+    data: SerialScan,
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user)
+):
+
+    # -----------------------------------------
+    # Find Task
+    # -----------------------------------------
+
+    task = (
+        db.query(PickTask)
+        .filter(PickTask.id == data.task_id)
+        .first()
+    )
+
+    if not task:
+        raise HTTPException(
+            status_code=404,
+            detail="Task Not Found"
+        )
+
+    # -----------------------------------------
+    # Find Serial
+    # -----------------------------------------
+
+    serial = (
+        db.query(PickSerial)
+        .filter(
+            PickSerial.task_id == task.id,
+            PickSerial.serial_no == data.serial,
+            PickSerial.status == "PENDING"
+        )
+        .first()
+    )
+
+    if not serial:
+        raise HTTPException(
+            status_code=400,
+            detail="Invalid / Already Picked Serial"
+        )
+
+    # -----------------------------------------
+    # Update Serial
+    # -----------------------------------------
+
+    serial.status = "PICKED"
+
+    # -----------------------------------------
+    # Update Inventory
+    # -----------------------------------------
+
+    inventory = (
+        db.query(Inventory)
+        .filter(
+            Inventory.serial_no == data.serial
+        )
+        .first()
+    )
+
+    if inventory:
+        inventory.status = "PICKED"
+
+    # -----------------------------------------
+    # Update Task
+    # -----------------------------------------
+
+    task.picked_qty += 1
+
+    if task.picked_qty >= task.required_qty:
+        task.status = "COMPLETED"
+
+    db.commit()
+
+    # -----------------------------------------
+    # Find Next Pending Task in Same Box
+    # -----------------------------------------
+
+    next_task = (
+        db.query(PickTask)
+        .filter(
+            PickTask.location == task.location,
+            PickTask.box == task.box,
+            PickTask.status == "PENDING"
+        )
+        .order_by(PickTask.sequence)
+        .first()
+    )
+
+    if next_task:
+
+        return {
+
+            "success": True,
+
+            "task_completed": task.status == "COMPLETED",
+
+            "box_completed": False,
+
+            "location_completed": False,
+
+            "task": {
+
+                "task_id": next_task.id,
+
+                "sku": next_task.sku,
+
+                "required_qty": next_task.required_qty,
+
+                "picked_qty": next_task.picked_qty,
+
+                "remaining_qty": next_task.required_qty - next_task.picked_qty
+
+            }
+
+        }
+
+    # -----------------------------------------
+    # Find Next Box in Same Location
+    # -----------------------------------------
+
+    next_box = (
+        db.query(PickTask)
+        .filter(
+            PickTask.location == task.location,
+            PickTask.status == "PENDING"
+        )
+        .order_by(
+            PickTask.box,
+            PickTask.sequence
+        )
+        .first()
+    )
+
+    if next_box:
+
+        return {
+
+            "success": True,
+
+            "task_completed": True,
+
+            "box_completed": True,
+
+            "location_completed": False,
+
+            "next_box": {
+
+                "box": next_box.box,
+
+                "task_id": next_box.id,
+
+                "sku": next_box.sku,
+
+                "required_qty": next_box.required_qty,
+
+                "picked_qty": next_box.picked_qty
+
+            }
+
+        }
+
+    # -----------------------------------------
+    # Location Completed
+    # -----------------------------------------
+
+    return {
+
+        "success": True,
+
+        "task_completed": True,
+
+        "box_completed": True,
+
+        "location_completed": True,
+
+        "message": "Location Completed"
+
+    }
+from pydantic import BaseModel
+
+class RFScan(BaseModel):
+    task_id: int
+    location: str
+    box: str
+    serial: str
+
+
+@router.post("/rf/scan")
+def rf_scan(
+    data: RFScan,
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user)
+):
+
+    task = db.query(PickTask).filter(
+        PickTask.id == data.task_id
+    ).first()
+
+    if not task:
+        raise HTTPException(404, "Task Not Found")
+
+    if task.location.strip().upper() != data.location.strip().upper():
+        raise HTTPException(
+            400,
+            f"Wrong Location. Expected {task.location}"
+        )
+
+    if task.box.strip().upper() != data.box.strip().upper():
+        raise HTTPException(
+            400,
+            f"Wrong Box. Expected {task.box}"
+        )
+
+    serial = (
+        db.query(PickSerial)
+        .filter(
+            PickSerial.task_id == task.id,
+            PickSerial.serial_no == data.serial,
+            PickSerial.status == "PENDING"
+        )
+        .first()
+    )
+
+    if not serial:
+        raise HTTPException(
+            400,
+            "Invalid Serial"
+        )
+
+    serial.status = "PICKED"
+
+    inventory = (
+        db.query(Inventory)
+        .filter(Inventory.serial_no == data.serial)
+        .first()
+    )
+
+    if inventory:
+        inventory.status = "PICKED"
+
+    task.picked_qty += 1
+
+    if task.picked_qty >= task.required_qty:
+        task.status = "COMPLETED"
+
+    db.commit()
+
+    return {
+        "success": True,
+        "message": "Pick Completed"
+    }
