@@ -21,7 +21,7 @@ function App() {
         <Route path="/inventory-upload" element={<InventoryUpload />} />
         <Route path="/orders-upload" element={<OrdersUpload />} />
         <Route path="/pick-tasks" element={<PickTasks />} />
-        <Route path="/rf-picking" element={<RFPicking />} />
+        <Route path="/rf-picking/:taskId" element={<RFPicking />} />
         <Route path="/generate-picking" element={<GeneratePicking />} />
         <Route path="/inventory-list" element={<InventoryList />} />
         <Route path="/supervisor-approval" element={<SupervisorApproval />} />
