@@ -1,14 +1,15 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
-import Login from "./pages/Login";
-import Dashboard from "./pages/Dashboard";
-import Picking from "./pages/Picking";
+import Login from "./pages/login";
+import Dashboard from "./pages/dashboard";
+import Picking from "./pages/picking";
 import InventoryUpload from "./pages/InventoryUpload";
 import OrdersUpload from "./pages/OrdersUpload";
 import PickTasks from "./pages/PickTasks";
 import RFPicking from "./pages/RFPicking";
 import GeneratePicking from "./pages/GeneratePicking";
 import InventoryList from "./pages/InventoryList";
+import SupervisorApproval from "./pages/SupervisorApproval";
 
 function App() {
   return (
@@ -23,6 +24,7 @@ function App() {
         <Route path="/rf-picking" element={<RFPicking />} />
         <Route path="/generate-picking" element={<GeneratePicking />} />
         <Route path="/inventory-list" element={<InventoryList />} />
+        <Route path="/supervisor-approval" element={<SupervisorApproval />} />
       </Routes>
     </BrowserRouter>
   );
