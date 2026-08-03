@@ -26,26 +26,38 @@ from app.routers import inventory_transactions
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
-    title="Warehouse RF System",
+    title="BAJWA PICKING SYSTEM",
     version="1.0.0"
 )
 
-# -----------------------------
-# CORS
-# -----------------------------
+# ==========================================================
+# CORS CONFIGURATION
+# ==========================================================
+origins = [
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+
+    # Vercel Frontend
+    "https://bajwa-picking-system-one.vercel.app",
+
+    # Render Backend (optional)
+    "https://bajwa-picking-system-1.onrender.com",
+
+    # Previous Render frontend (optional)
+    "https://warehouse-wms-tgaz.onrender.com",
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:5173",
-        "http://127.0.0.1:5173",
-        "https://warehouse-wms-tgaz.onrender.com"
-    ],
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Register Routers
+# ==========================================================
+# ROUTERS
+# ==========================================================
 app.include_router(inventory_router)
 app.include_router(orders_router)
 app.include_router(picking_router)
@@ -57,8 +69,11 @@ app.include_router(users.router)
 app.include_router(dashboard.router)
 app.include_router(inventory_transactions.router)
 
+# ==========================================================
+# HOME
+# ==========================================================
 @app.get("/")
 def home():
     return {
-        "message": "Warehouse RF System is Running"
+        "message": "BAJWA PICKING SYSTEM Backend Running"
     }
